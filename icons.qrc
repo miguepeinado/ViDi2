@@ -1,0 +1,40 @@
+<RCC>
+  <qresource prefix="image">
+    <file>resources/auto-roi.svg</file>
+    <file>resources/change-slice.svg</file>
+    <file>resources/clone-rois.svg</file>
+    <file>resources/copy.svg</file>
+    <file>resources/exit.svg</file>
+    <file>resources/WL.svg</file>
+    <file>resources/roi-stats.svg</file>
+    <file>resources/open-file.svg</file>
+    <file>resources/select.svg</file>
+    <file>resources/zoom.svg</file>
+  </qresource>
+  <qresource prefix="cursor">
+    <file>resources/add-point-cursor.svg</file>
+    <file>resources/arrow-cursor.svg</file>
+    <file>resources/change-slice-cursor.svg</file>
+    <file>resources/cursor-delete.svg</file>
+    <file>resources/del-point-cursor.svg</file>
+    <file>resources/WL-cursor.svg</file>
+    <file>resources/zoom-cursor.svg</file>
+  </qresource>
+  <qresource prefix="database">
+    <file>resources/new-patient.svg</file>
+    <file>resources/medicine.svg</file>
+    <file>resources/trebol.svg</file>
+    <file>resources/item-collapsed.svg</file>
+    <file>resources/treatment.svg</file>
+    <file>resources/item-expanded.svg</file>
+    <file>resources/edit.svg</file>
+    <file>resources/notas.svg</file>
+    <file>resources/undo.svg</file>
+    <file>resources/lock.svg</file>
+    <file>resources/patient.svg</file>
+    <file>resources/unlock.svg</file>
+  </qresource>
+  <qresource prefix="main">
+    <file>resources/ViDi.svg</file>
+  </qresource>
+</RCC>
