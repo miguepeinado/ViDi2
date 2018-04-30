@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.91 r13725"
+   width="48"
+   height="48"
+   viewBox="0 0 48 48"
+   sodipodi:docname="patient-info.svg">
+  <metadata
+     id="metadata8">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs6" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1680"
+     inkscape:window-height="1026"
+     id="namedview4"
+     showgrid="false"
+     inkscape:zoom="8"
+     inkscape:cx="23.893351"
+     inkscape:cy="46.472656"
+     inkscape:window-x="0"
+     inkscape:window-y="24"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg2" />
+  <path
+     style="fill:#00c000;fill-opacity:1;stroke:#00c000;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:2;stroke-dasharray:none;stroke-opacity:1"
+     d="m 34.370451,44.887414 c -3.823421,-0.622933 -6.722434,-4.537244 -6.169044,-8.381503 0.236571,-3.943108 4.098581,-7.263497 8.044922,-6.865587 4.175044,-0.0241 7.726556,4.048026 7.286052,8.180532 -0.07857,4.189965 -4.214628,7.685383 -8.359938,7.159589 -0.268646,-0.01754 -0.536677,-0.04696 -0.801992,-0.09303 z m 3.395973,-1.630436 c 3.043434,-0.959091 4.988822,-4.386276 4.126927,-7.484845 -0.77899,-3.594152 -5.103095,-5.7318 -8.440515,-4.209865 -3.597897,1.347532 -5.018503,6.287176 -2.690321,9.347471 1.525832,2.230105 4.445176,3.14029 7.003909,2.347239 z M 4.2028307,39.539245 c 0.1478597,-2.726386 -0.4681018,-5.694031 1.0741569,-8.144413 2.0531995,-3.80912 5.8130654,-6.300104 9.6523534,-8.053709 -3.284243,-2.956591 -4.909665,-7.766558 -3.55324,-12.054207 1.41052,-5.1636666 6.759588,-8.8233423 12.081314,-8.2277411 6.079096,0.2979156 11.092496,6.2132379 10.508485,12.2516591 -0.115447,3.045736 -1.729768,5.817566 -3.856675,7.914953 1.555607,0.897819 4.033048,1.48851 4.779805,3.006494 -0.597244,1.764111 -1.767875,-0.06082 -2.751371,-0.358078 -1.353749,-1.089193 -4.414628,-1.329373 -4.996443,-2.384774 3.214222,-1.849993 5.528181,-5.390667 5.333238,-9.17043 0.08894,-5.4855064 -5.101952,-10.2896765 -10.564488,-9.8111862 -5.239885,0.1111773 -9.747714,4.9890815 -9.470704,10.2096352 -0.06411,3.532468 2.122012,6.780885 5.078397,8.576082 1.31795,1.070323 -2.110483,1.15006 -2.825239,1.861706 -3.823031,1.74889 -7.5443469,4.672335 -8.8493133,8.818669 -0.2785232,3.134467 -0.089706,6.294834 -0.142119,9.440973 7.1414913,0.04696 14.2884743,-0.05648 21.4255263,0.136076 0.422013,1.034233 -0.03791,1.619005 -1.084723,1.342547 l -21.8650143,0.0395 c 0.00868,-1.797913 0.017402,-3.595872 0.026054,-5.393756 z"
+     id="path4148"
+     inkscape:connector-curvature="0"
+     sodipodi:nodetypes="cccccccccccccccccccccccccccccccc" />
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#00c000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     x="33.9375"
+     y="41.375"
+     id="text4183"
+     sodipodi:linespacing="125%"><tspan
+       sodipodi:role="line"
+       x="33.9375"
+       y="41.375"
+       id="tspan4187"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:11.25px;font-family:serif;-inkscape-font-specification:'serif Bold';fill:#00c000;fill-opacity:1;stroke:none;stroke-opacity:1">i</tspan></text>
+</svg>

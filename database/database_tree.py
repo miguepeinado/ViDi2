@@ -11,7 +11,6 @@ import patient
 class Tree(QtGui.QFrame):
 
     pull_message = QtCore.pyqtSignal(QtCore.QString)
-    # empty_tree = QtCore.pyqtSignal()
     node_selected = QtCore.pyqtSignal(QtCore.QString, QtCore.QString)
 
     def __init__(self, db, parent=None):
@@ -46,10 +45,7 @@ class Tree(QtGui.QFrame):
         # Populate tree
         self.tree_model = MyModel(self.db, parent=self)
         self.db_tree.setModel(self.tree_model)
-
         self.tree_model.populate()
-    def force_new_patient(self):
-        QtGui.QMessageBox("Force new patient or exit")
 
     def item_clicked(self, ix):
         item_type, item_key = self.tree_model.itemFromIndex(ix).get_key()
@@ -64,18 +60,22 @@ class Tree(QtGui.QFrame):
             self.patient_form.setVisible(False)
             self.spacer.setVisible(True)
 
-    def new_patient(self):
+    def new_patient(self, force_input):
+        """
+        :param force_input: Force input of a new patient or exit program (when tree is empty)
+        :return: nothing
+        """
+
         dlg = QtGui.QDialog()
         dlg.setWindowTitle("Patients")
         l = QtGui.QVBoxLayout()
-        l.addWidget(QtGui.QLabel("<b>Input patient data...</b>"))
+        l.addWidget(QtGui.QLabel("<b>First of all, please input patient data...</b>"))
         form = patient.PatientForm(self.db, mode=patient.PatientForm.NEW_RECORD, parent=self)
         form.new_record_stored.connect(dlg.accept)
         l.addWidget(form)
         l.addWidget(QtGui.QLabel("<b>or...</b>"))
-        bt_from_images = QtGui.QPushButton("Get from images")
+        bt_from_images = QtGui.QPushButton("Gather patient data from images")
         bt_from_images.setIcon(QtGui.QIcon(":/image/resources/open-file.svg"))
-        # bt_from_images.clicked.connect()
         l.addWidget(bt_from_images)
         dlg.setLayout(l)
         if dlg.exec_() == QtGui.QDialog.Accepted:
@@ -85,9 +85,11 @@ class Tree(QtGui.QFrame):
             item = MyItem(txt, tx_key, QtGui.QIcon(":/database/resources/new-patient.svg"),
                           active=True, is_header=False)
             self.tree_model.appendRow(item)
+            dlg.close()
         else:
-            print "if no patient in tree must exit application"
-        dlg.close()
+            if force_input:
+                QtGui.QMessageBox.critical(self, "Update database", "Input patient failed. Must exit")
+                sys.exit(1)
 
     def open_context_menu(self, position):
         self.context_menu.exec_(self.db_tree.viewport().mapToGlobal(position))
@@ -132,8 +134,8 @@ class MyModel(QtGui.QStandardItemModel):
         query.first()
         if not query.isValid():
             if level == 0:
-                logging.info("no patients in database")
-                self.parent().force_new_patient()
+                logging.info("no patients in database...must input one")
+                self.parent().new_patient(force_input=True)
             return
         while True:
             active = True

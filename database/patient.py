@@ -12,7 +12,7 @@ class PatientForm(ui_patient.Ui_Patient, QFrame):
     NEW_RECORD = 1
     SHOW_RECORD = 2
     new_record_stored = pyqtSignal()
-    record_updated = pyqtSignal(QString)
+    # record_updated = pyqtSignal(QString)
 
     def __init__(self, db, mode=SHOW_RECORD, patient_id=None, parent=None):
         # Invoke parent's method
