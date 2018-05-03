@@ -118,30 +118,6 @@ class MainGui(QtGui.QMainWindow, ui_main.Ui_MainWindow):
         self.dock_widget.setWidget(self.db_widget)
         # self.db_widget.populate()
 
-    def force_new_patient(self):
-        def close_dialog():
-            logging.critical("EXIT!!!")
-            sys.exit(0)
-        # dlg = QtGui.QDialog(self)
-        dlg = QtGui.QDialog()
-        dlg.setWindowTitle("Patients")
-        dlg.rejected.connect(close_dialog)
-        l = QtGui.QVBoxLayout()
-        l.addWidget(QtGui.QLabel("<b>Input patient data...</b>"))
-        form = database.PatientForm(self.db_connect, mode=database.PatientForm.NEW_RECORD, parent=self)
-        form.new_record_stored.connect(self.buzz)       #dlg.accepted)
-        l.addWidget(form)
-        l.addWidget(QtGui.QLabel("<b>or...</b>"))
-        bt_from_images = QtGui.QPushButton("Get from images")
-        bt_from_images.setIcon(QtGui.QIcon(":/image/resources/open-file.svg"))
-        # bt_from_images.clicked.connect()
-        l.addWidget(bt_from_images)
-        dlg.setLayout(l)
-        dlg.exec_()
-        # update tree
-        self.db_widget.populate()
-
-
     # def closeEvent(self, ev):
     #     self.fr_dosimetry.about_2_close()
     #     super(MainGui, self).closeEvent(ev)

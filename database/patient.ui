@@ -29,7 +29,7 @@
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>10</y>
+     <y>20</y>
      <width>421</width>
      <height>364</height>
     </rect>
@@ -38,20 +38,7 @@
     <property name="margin">
      <number>10</number>
     </property>
-    <item row="0" column="1">
-     <widget class="QLabel" name="label_2">
-      <property name="text">
-       <string>ID:</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-      </property>
-      <property name="buddy">
-       <cstring>tx_id</cstring>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="0" colspan="2">
+    <item row="3" column="0">
      <widget class="QLabel" name="label_6">
       <property name="text">
        <string>Weight  (kg):</string>
@@ -64,7 +51,20 @@
       </property>
      </widget>
     </item>
-    <item row="3" column="2">
+    <item row="1" column="0">
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string>Name:</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+      <property name="buddy">
+       <cstring>tx_name</cstring>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="1">
      <widget class="QLineEdit" name="tx_weight">
       <property name="enabled">
        <bool>true</bool>
@@ -80,6 +80,134 @@
         <width>50</width>
         <height>16777215</height>
        </size>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="4">
+     <widget class="QLineEdit" name="tx_age">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>50</width>
+        <height>16777215</height>
+       </size>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1" colspan="4">
+     <widget class="QLineEdit" name="tx_name">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="3">
+     <widget class="QLabel" name="label_4">
+      <property name="text">
+       <string>Age:</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+      <property name="buddy">
+       <cstring>tx_age</cstring>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="1" colspan="2">
+     <widget class="QDateEdit" name="dt_birth_date">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>120</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="frame">
+       <bool>true</bool>
+      </property>
+      <property name="displayFormat">
+       <string>dd/MM/yyyy</string>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QLabel" name="label_2">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text">
+       <string>ID:</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+      <property name="buddy">
+       <cstring>tx_id</cstring>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="0" colspan="5">
+     <widget class="QPlainTextEdit" name="tx_notes">
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>16777215</height>
+       </size>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="2" colspan="3">
+     <widget class="QLineEdit" name="tx_id">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>150</width>
+        <height>16777215</height>
+       </size>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="label_3">
+      <property name="text">
+       <string>Birth date:</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+      <property name="buddy">
+       <cstring>dt_birth_date</cstring>
       </property>
      </widget>
     </item>
@@ -115,128 +243,6 @@
         <string>Other</string>
        </property>
       </item>
-     </widget>
-    </item>
-    <item row="1" column="1">
-     <widget class="QLabel" name="label">
-      <property name="text">
-       <string>Name:</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-      </property>
-      <property name="buddy">
-       <cstring>tx_name</cstring>
-      </property>
-     </widget>
-    </item>
-    <item row="4" column="0" colspan="6">
-     <widget class="QPlainTextEdit" name="tx_notes">
-      <property name="maximumSize">
-       <size>
-        <width>50000</width>
-        <height>16777215</height>
-       </size>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="5">
-     <widget class="QLineEdit" name="tx_age">
-      <property name="enabled">
-       <bool>true</bool>
-      </property>
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>50</width>
-        <height>16777215</height>
-       </size>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="2" colspan="4">
-     <widget class="QLineEdit" name="tx_name">
-      <property name="enabled">
-       <bool>true</bool>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="1">
-     <widget class="QLabel" name="label_3">
-      <property name="text">
-       <string>Birth date:</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-      </property>
-      <property name="buddy">
-       <cstring>dt_birth_date</cstring>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="2" colspan="3">
-     <widget class="QLineEdit" name="tx_id">
-      <property name="enabled">
-       <bool>true</bool>
-      </property>
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>150</width>
-        <height>16777215</height>
-       </size>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="4">
-     <widget class="QLabel" name="label_4">
-      <property name="text">
-       <string>Age:</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-      </property>
-      <property name="buddy">
-       <cstring>tx_age</cstring>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="2" colspan="2">
-     <widget class="QDateEdit" name="dt_birth_date">
-      <property name="enabled">
-       <bool>true</bool>
-      </property>
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>120</width>
-        <height>16777215</height>
-       </size>
-      </property>
-      <property name="frame">
-       <bool>true</bool>
-      </property>
-      <property name="displayFormat">
-       <string>dd/MM/yyyy</string>
-      </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
      </widget>
     </item>
     <item row="3" column="3">
@@ -292,12 +298,10 @@
   </action>
  </widget>
  <tabstops>
-  <tabstop>tx_id</tabstop>
   <tabstop>tx_name</tabstop>
   <tabstop>dt_birth_date</tabstop>
   <tabstop>tx_age</tabstop>
   <tabstop>tx_weight</tabstop>
-  <tabstop>cb_sex</tabstop>
   <tabstop>tx_notes</tabstop>
  </tabstops>
  <resources>

@@ -5,18 +5,20 @@ from PyQt4 import QtCore
 from PyQt4 import QtGui
 from PyQt4 import QtSql
 import icons_rc
-import patient
+import patient, treatment
 
 
 class Tree(QtGui.QFrame):
 
     pull_message = QtCore.pyqtSignal(QtCore.QString)
-    node_selected = QtCore.pyqtSignal(QtCore.QString, QtCore.QString)
+    # node_selected = QtCore.pyqtSignal(QtCore.QString, QtCore.QString)
 
     def __init__(self, db, parent=None):
         # Invoke parent's method
         super(Tree, self).__init__(parent)
+        # init some variables
         self.db = db
+        self.levels = ["P", "T", "S"]
         # Setup gui
         self.setFrameShape(QtGui.QFrame.StyledPanel)
         self.setFrameShadow(QtGui.QFrame.Raised)
@@ -25,12 +27,22 @@ class Tree(QtGui.QFrame):
         self.db_tree.setMinimumHeight(250)
         self.db_tree.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.MinimumExpanding)
         self.db_tree.clicked.connect(self.item_clicked)
+
         # ...context menu
         self.context_menu = QtGui.QMenu()
         self.act_new_patient = QtGui.QAction(QtGui.QIcon(":/database/resources/new-patient.svg"),
                                          "New patient", self.context_menu)
         self.act_new_patient.triggered.connect(self.new_patient)
         self.context_menu.addAction(self.act_new_patient)
+        self.act_new_treatment = QtGui.QAction(QtGui.QIcon(":/database/resources/treatment.svg"),
+                                               "New treatment", self.context_menu)
+        self.act_new_treatment.triggered.connect(self.new_treatment)
+        self.context_menu.addAction(self.act_new_treatment)
+        self.act_new_session = QtGui.QAction(QtGui.QIcon(":/database/resources/medicine.svg"),
+                                               "New session", self.context_menu)
+        # self.act_new_session.triggered.connect(self.new_session)
+        self.context_menu.addAction(self.act_new_session)
+        # Widgets
         self.db_tree.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.db_tree.customContextMenuRequested.connect(self.open_context_menu)
         l.addWidget(self.db_tree)
@@ -38,9 +50,16 @@ class Tree(QtGui.QFrame):
         self.spacer.setFixedSize(QtCore.QSize(400, 200))
         l.addWidget(self.spacer)
         self.patient_form = patient.PatientForm(self.db)
-        self.spacer.setFixedSize(QtCore.QSize(400, 200))
+        self.patient_form.record_updated.connect(self.update_item)
+        self.patient_form.setFixedWidth(400)
         l.addWidget(self.patient_form)
         self.patient_form.setVisible(False)
+        self.treatment_form = treatment.TreatmentForm(self.db)
+        self.treatment_form.record_updated.connect(self.update_item)
+        self.treatment_form.lock_record.connect(self.lock_item)
+        self.treatment_form.setFixedWidth(400)
+        l.addWidget(self.treatment_form)
+        self.treatment_form.setVisible(False)
         self.setLayout(l)
         # Populate tree
         self.tree_model = MyModel(self.db, parent=self)
@@ -49,13 +68,19 @@ class Tree(QtGui.QFrame):
 
     def item_clicked(self, ix):
         item_type, item_key = self.tree_model.itemFromIndex(ix).get_key()
+        locked = self.tree_model.itemFromIndex(ix).is_locked()
         self.spacer.setVisible(False)
+        # Hide all the frames
+        for c in self.children():
+            if isinstance(c, QtGui.QFrame) and not type(c) == QtGui.QTreeView:
+                c.setVisible(False)
+        # Show only de correct one
         if item_type == "P":
             self.patient_form.setVisible(True)
             self.patient_form.update_form(item_key)
         elif item_type == "T":
-            self.patient_form.setVisible(False)
-            self.spacer.setVisible(True)
+            self.treatment_form.setVisible(True)
+            self.treatment_form.update_form(item_key, locked)
         elif item_type == "S":
             self.patient_form.setVisible(False)
             self.spacer.setVisible(True)
@@ -67,7 +92,7 @@ class Tree(QtGui.QFrame):
         """
 
         dlg = QtGui.QDialog()
-        dlg.setWindowTitle("Patients")
+        dlg.setWindowTitle("New Patient")
         l = QtGui.QVBoxLayout()
         l.addWidget(QtGui.QLabel("<b>First of all, please input patient data...</b>"))
         form = patient.PatientForm(self.db, mode=patient.PatientForm.NEW_RECORD, parent=self)
@@ -83,7 +108,7 @@ class Tree(QtGui.QFrame):
             tx_key = "P#" + str(form.tx_id.text())
             txt = str(form.tx_name.text())
             item = MyItem(txt, tx_key, QtGui.QIcon(":/database/resources/new-patient.svg"),
-                          active=True, is_header=False)
+                          locked=False, is_header=True)
             self.tree_model.appendRow(item)
             dlg.close()
         else:
@@ -91,11 +116,59 @@ class Tree(QtGui.QFrame):
                 QtGui.QMessageBox.critical(self, "Update database", "Input patient failed. Must exit")
                 sys.exit(1)
 
+    def new_treatment(self):
+        # get parent node
+        ix = self.db_tree.currentIndex()
+        parent_item = self.tree_model.itemFromIndex(ix).parent()
+        _, key = parent_item.get_key()
+        dlg = QtGui.QDialog()
+        dlg.setWindowTitle("New Treatment")
+        l = QtGui.QVBoxLayout()
+        form = treatment.TreatmentForm(self.db, mode=treatment.TreatmentForm.NEW_RECORD,
+                                       parent_id=key, parent=self)
+        form.new_record_stored.connect(dlg.accept)
+        l.addWidget(form)
+        dlg.setLayout(l)
+        if dlg.exec_() == QtGui.QDialog.Accepted:
+            # Add new row instead of repopulate all the tree
+            tx_key = "T#" + str(form.record_id)
+            txt = form.tx_diagnostic.text() + " (" + form.tx_physician.text() + ")"
+            item = MyItem(txt, tx_key, QtGui.QIcon(":/database/resources/treatment.svg"),
+                          locked=False, is_header=False)
+            parent_item.appendRow(item)
+            dlg.close()
+
     def open_context_menu(self, position):
+        ix = self.db_tree.indexAt(position)
+        item = self.tree_model.itemFromIndex(ix)
+        t, _ = item.get_key()
+        level = self.levels.index(t)
+        # Disable action if not in the correct level
+        menu_action_list = self.context_menu.actions()
+        for a in menu_action_list:
+            a.setVisible(abs(menu_action_list.index(a) - level) <= 1)
+        # Disable action if some item brother is enabled
+        parent_item = item.parent()
+        if level > 0:
+            all_locked = True
+            for i in range(parent_item.rowCount()):
+                all_locked = all_locked & parent_item.child(i).is_locked()
+            if not all_locked:
+                self.context_menu.actions()[level].setEnabled(False)
+                tx = self.context_menu.actions()[level].text()
+                self.context_menu.actions()[level].setText("Some items unlocked: Can't create a " + tx)
         self.context_menu.exec_(self.db_tree.viewport().mapToGlobal(position))
 
-    # def populate(self):
-    #     self.tree_model.populate()
+    def update_item(self, txt):
+        ix = self.db_tree.currentIndex()
+        item = self.tree_model.itemFromIndex(ix)
+        item.setText(txt)
+
+    def lock_item(self):
+        ix = self.db_tree.currentIndex()
+        item = self.tree_model.itemFromIndex(ix)
+        item.set_locked(True)
+        self.db_tree.update(ix)
 
 
 class MyModel(QtGui.QStandardItemModel):
@@ -138,13 +211,18 @@ class MyModel(QtGui.QStandardItemModel):
                 self.parent().new_patient(force_input=True)
             return
         while True:
-            active = True
+            header = False
             if level == 0:
+                locked = False
+                header = True
                 txt = query.value(1).toString() + " (" + query.value(0).toString() + ")"
             elif level == 1:
+                locked = query.value(8).toBool()
                 txt = query.value(2).toString()
                 txt += " (" + query.value(3).toString() + ")" if not query.value(3).isNull() else ""
+                print txt + "<<< treatment locked >>>" if locked else ""
             elif level == 2:
+                locked = True
                 txt = query.value(4).toString()
                 txt += " (" + query.value(3).toString() + " MBq)"
             key = query.value(0)
@@ -152,7 +230,7 @@ class MyModel(QtGui.QStandardItemModel):
             key = key.toString() if level == 0 else k
             tx_key = self.tables[level][0] + "#" + str(key)
             print "item: key={}, text={}".format(tx_key, txt)
-            item = MyItem(txt, tx_key, self.node_icons[level], active, is_header=False)
+            item = MyItem(txt, tx_key, self.node_icons[level], locked, is_header=header)
             self.populate(item, level + 1)
             parent_node.appendRow(item)
             if not query.next():
@@ -163,11 +241,11 @@ class MyItem(QtGui.QStandardItem):
     """
     Subclassing tree items
     - key: Allows a link between parent and children nodes
-    - active: Let know if node is always active
+    - locked: Let know if node is always locked
     - is_header:
     """
 
-    def __init__(self, text, key="", icon=None, active=True, highlighted=False, is_header=False):
+    def __init__(self, text, key="", icon=None, locked=True, highlighted=False, is_header=False):
         if icon is not None:
             super(MyItem, self).__init__(icon, text)
         else:
@@ -175,20 +253,19 @@ class MyItem(QtGui.QStandardItem):
         self.highlighted = highlighted
         self.is_header = is_header
         self.key = key
-        self.active = active
-        # Segun su rol cambiamos el aspecto
+        self.locked = locked
+        # Change colors after its role
         fnt = self.font()
-        fnt.setPointSize(10)
-        if not active:
-            self.setForeground(QtGui.QBrush(QtGui.QColor(255, 255, 255)))
-            self.setBackground(QtGui.QBrush(QtGui.QColor(255, 32, 32)))
+        if locked:
+            fnt.setItalic(True)
+            self.setForeground(QtGui.QBrush(QtGui.QColor(0, 192, 0)))
+            self.setBackground(QtGui.QBrush(QtGui.QColor(224, 224, 224)))
             self.setToolTip("Inactive record")
         elif self.highlighted:
             self.setForeground(QtGui.QBrush(QtGui.QColor(255, 255, 255)))
             self.setBackground(QtGui.QBrush(QtGui.QColor(255, 186, 159)))
             self.setToolTip("Highlighted record")
         if self.is_header:
-            fnt.setPointSize(11)
             fnt.setWeight(50)
             fnt.setStretch(125)
         self.setFont(fnt)
@@ -201,11 +278,23 @@ class MyItem(QtGui.QStandardItem):
         key_value = self.key[i + 1:]
         return item_type, key_value
 
-    def is_active(self):
-        return self.active
+    def is_locked(self):
+        return self.locked
+
+    def set_locked(self, locked):
+        self.locked = locked
+        fnt = self.font()
+        fnt.setItalic(locked)
+        if locked:
+            self.setForeground(QtGui.QBrush(QtGui.QColor(0, 192, 0)))
+            self.setBackground(QtGui.QBrush(QtGui.QColor(224, 224, 224)))
+            self.setToolTip("Inactive record")
+        else:
+            self.setForeground(QtGui.QBrush(QtCore.Qt.black))
+            self.setBackground(QtGui.QBrush(QtCore.Qt.white))
 
     def set_highlighted(self, highlighted):
-        if not self.active:
+        if not self.locked:
             return
         self.highlighted = highlighted
         fore_color = QtGui.QColor(255, 255, 255) if self.highlighted else QtGui.QColor(0, 127, 0)

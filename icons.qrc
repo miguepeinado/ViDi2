@@ -21,6 +21,7 @@
     <file>resources/zoom-cursor.svg</file>
   </qresource>
   <qresource prefix="database">
+    <file>resources/tools.svg</file>
     <file>resources/new-patient.svg</file>
     <file>resources/medicine.svg</file>
     <file>resources/trebol.svg</file>

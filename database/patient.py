@@ -12,7 +12,7 @@ class PatientForm(ui_patient.Ui_Patient, QFrame):
     NEW_RECORD = 1
     SHOW_RECORD = 2
     new_record_stored = pyqtSignal()
-    # record_updated = pyqtSignal(QString)
+    record_updated = pyqtSignal(QString)
 
     def __init__(self, db, mode=SHOW_RECORD, patient_id=None, parent=None):
         # Invoke parent's method
@@ -32,7 +32,7 @@ class PatientForm(ui_patient.Ui_Patient, QFrame):
         self.tx_weight.installEventFilter(self)
         self.cb_sex.installEventFilter(self)
         # ...actions
-        menu_widget = QPushButton("Tools")
+        menu_widget = QPushButton(QIcon(":/database/resources/tools.svg"), "Tools")
         menu = QMenu()
         menu.addAction(self.act_edit)
         menu.addAction(self.act_undo)
@@ -68,8 +68,6 @@ class PatientForm(ui_patient.Ui_Patient, QFrame):
             self.patient_mapper.setCurrentIndex(row)
             self.tx_id.setEnabled(True)
             self.act_edit.trigger()
-        else:
-            logging.info("patient data already in db...update treatment form")
 
     def edit_record(self):
         if self.act_edit.isChecked():
@@ -82,9 +80,13 @@ class PatientForm(ui_patient.Ui_Patient, QFrame):
                                         QMessageBox.Apply | QMessageBox.Cancel) != QMessageBox.Apply:
                     self.act_edit.setChecked(True)
                     return
-            if self.submit_record():
-                self.enable_fields(False)
-                self.act_edit.setText("Edit")
+                if self.submit_record():
+                    self.enable_fields(False)
+                    self.act_edit.setText("Edit")
+                    txt = self.tx_name.text() + " (" + self.tx_id.text() + ")"
+                    self.record_updated.emit(txt)
+            else:
+                self.act_edit.setChecked(True)
 
     def enable_fields(self, enabled):
         self.tx_name.setEnabled(enabled)
@@ -132,7 +134,7 @@ class PatientForm(ui_patient.Ui_Patient, QFrame):
                                  "Error managing patient record..." + self.patient_model.lastError().text())
             return False
         else:
-            logging.info("\tPatient (id={}) new record stored: OK".format(self.tx_id.text()))
+            logging.info("\tPatient (id={}) record updated: OK".format(self.tx_id.text()))
         if self.mode == self.NEW_RECORD:
             self.new_record_stored.emit()
         self.record_changed = False
