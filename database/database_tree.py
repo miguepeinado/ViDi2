@@ -156,6 +156,7 @@ class Tree(QtGui.QFrame):
             if not all_locked:
                 self.context_menu.actions()[level].setEnabled(False)
                 tx = self.context_menu.actions()[level].text()
+                # todo: verify all_locked in the three menu item visible
                 self.context_menu.actions()[level].setText("Some items unlocked: Can't create a " + tx)
         self.context_menu.exec_(self.db_tree.viewport().mapToGlobal(position))
 
