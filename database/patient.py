@@ -83,7 +83,7 @@ class PatientForm(ui_patient.Ui_Patient, QFrame):
                 if self.submit_record():
                     self.enable_fields(False)
                     self.act_edit.setText("Edit")
-                    txt = self.tx_name.text() + " (" + self.tx_id.text() + ")"
+                    txt = str(self)
                     self.record_updated.emit(txt)
             else:
                 self.act_edit.setChecked(True)
@@ -113,7 +113,6 @@ class PatientForm(ui_patient.Ui_Patient, QFrame):
 
         if evt.type() == QEvent.FocusIn:
             self.old_value = get_value(o)
-            # print self.old_value
         elif evt.type() == QEvent.FocusOut:
             self.record_changed = (self.old_value != get_value(o))
             logging.info("record ({}) has changed".format(self.tx_id.text()))

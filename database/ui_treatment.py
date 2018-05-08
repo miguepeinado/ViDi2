@@ -162,6 +162,7 @@ class Ui_Frame(object):
         self.act_edit.setIcon(icon)
         self.act_edit.setObjectName(_fromUtf8("act_edit"))
         self.act_undo = QtGui.QAction(Frame)
+        self.act_undo.setEnabled(False)
         icon1 = QtGui.QIcon()
         icon1.addPixmap(QtGui.QPixmap(_fromUtf8(":/database/resources/undo.svg")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.act_undo.setIcon(icon1)

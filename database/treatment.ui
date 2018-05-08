@@ -311,6 +311,9 @@
    </property>
   </action>
   <action name="act_undo">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="../icons.qrc">
      <normaloff>:/database/resources/undo.svg</normaloff>:/database/resources/undo.svg</iconset>

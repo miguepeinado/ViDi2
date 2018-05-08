@@ -5,13 +5,18 @@ from PyQt4 import QtCore
 from PyQt4 import QtGui
 from PyQt4 import QtSql
 import icons_rc
-import patient, treatment
+import patient, treatment, session
 
 
 class Tree(QtGui.QFrame):
 
     pull_message = QtCore.pyqtSignal(QtCore.QString)
     # node_selected = QtCore.pyqtSignal(QtCore.QString, QtCore.QString)
+    #
+    # How to lock all children of a locked node?
+    # 1. In DB best but too many work
+    # 2. In tree: Easy but means inconsistencied between DB and GUI
+    #
 
     def __init__(self, db, parent=None):
         # Invoke parent's method
@@ -24,7 +29,9 @@ class Tree(QtGui.QFrame):
         self.setFrameShadow(QtGui.QFrame.Raised)
         l = QtGui.QVBoxLayout()
         self.db_tree = QtGui.QTreeView(self)
-        self.db_tree.setMinimumHeight(250)
+        self.db_tree.setMinimumHeight(400)
+        self.db_tree.setIndentation(16)
+        self.db_tree.setIconSize(QtCore.QSize(20, 20))
         self.db_tree.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.MinimumExpanding)
         self.db_tree.clicked.connect(self.item_clicked)
 
@@ -40,26 +47,37 @@ class Tree(QtGui.QFrame):
         self.context_menu.addAction(self.act_new_treatment)
         self.act_new_session = QtGui.QAction(QtGui.QIcon(":/database/resources/medicine.svg"),
                                                "New session", self.context_menu)
-        # self.act_new_session.triggered.connect(self.new_session)
+        self.act_new_session.triggered.connect(self.new_session)
         self.context_menu.addAction(self.act_new_session)
-        # Widgets
+        # Widgets...
         self.db_tree.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.db_tree.customContextMenuRequested.connect(self.open_context_menu)
         l.addWidget(self.db_tree)
-        self.spacer = QtGui.QLabel(" ")
-        self.spacer.setFixedSize(QtCore.QSize(400, 200))
-        l.addWidget(self.spacer)
+        self.space_keeper = QtGui.QLabel(" ")
+        self.space_keeper.setFixedSize(QtCore.QSize(400, 200))
+        l.addWidget(self.space_keeper)
+        # ...Patient form
         self.patient_form = patient.PatientForm(self.db)
         self.patient_form.record_updated.connect(self.update_item)
         self.patient_form.setFixedWidth(400)
         l.addWidget(self.patient_form)
         self.patient_form.setVisible(False)
+        # ...Treatment form
         self.treatment_form = treatment.TreatmentForm(self.db)
         self.treatment_form.record_updated.connect(self.update_item)
         self.treatment_form.lock_record.connect(self.lock_item)
         self.treatment_form.setFixedWidth(400)
         l.addWidget(self.treatment_form)
         self.treatment_form.setVisible(False)
+        # ...Session form
+        self.session_form = session.SessionForm(self.db)
+        self.session_form.record_updated.connect(self.update_item)
+        self.session_form.lock_record.connect(self.lock_item)
+        self.session_form.setFixedWidth(400)
+        l.addWidget(self.session_form)
+        self.session_form.setVisible(False)
+        spring = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        l.addItem(spring)
         self.setLayout(l)
         # Populate tree
         self.tree_model = MyModel(self.db, parent=self)
@@ -69,7 +87,7 @@ class Tree(QtGui.QFrame):
     def item_clicked(self, ix):
         item_type, item_key = self.tree_model.itemFromIndex(ix).get_key()
         locked = self.tree_model.itemFromIndex(ix).is_locked()
-        self.spacer.setVisible(False)
+        self.space_keeper.setVisible(False)
         # Hide all the frames
         for c in self.children():
             if isinstance(c, QtGui.QFrame) and not type(c) == QtGui.QTreeView:
@@ -82,8 +100,10 @@ class Tree(QtGui.QFrame):
             self.treatment_form.setVisible(True)
             self.treatment_form.update_form(item_key, locked)
         elif item_type == "S":
-            self.patient_form.setVisible(False)
-            self.spacer.setVisible(True)
+            self.session_form.setVisible(True)
+            self.session_form.update_form(item_key, locked)
+        else:
+            self.space_keeper.setVisible(True)
 
     def new_patient(self, force_input):
         """
@@ -106,7 +126,7 @@ class Tree(QtGui.QFrame):
         if dlg.exec_() == QtGui.QDialog.Accepted:
             # Add new row instead of repopulate all the tree
             tx_key = "P#" + str(form.tx_id.text())
-            txt = str(form.tx_name.text())
+            txt = str(form)
             item = MyItem(txt, tx_key, QtGui.QIcon(":/database/resources/new-patient.svg"),
                           locked=False, is_header=True)
             self.tree_model.appendRow(item)
@@ -119,7 +139,10 @@ class Tree(QtGui.QFrame):
     def new_treatment(self):
         # get parent node
         ix = self.db_tree.currentIndex()
+        # todo: Verify what happens when new treatment is triggered from patient node
         parent_item = self.tree_model.itemFromIndex(ix).parent()
+        if parent_item is None:
+            parent_item = self.tree_model.itemFromIndex(ix)
         _, key = parent_item.get_key()
         dlg = QtGui.QDialog()
         dlg.setWindowTitle("New Treatment")
@@ -132,8 +155,36 @@ class Tree(QtGui.QFrame):
         if dlg.exec_() == QtGui.QDialog.Accepted:
             # Add new row instead of repopulate all the tree
             tx_key = "T#" + str(form.record_id)
-            txt = form.tx_diagnostic.text() + " (" + form.tx_physician.text() + ")"
+            txt = str(form)
             item = MyItem(txt, tx_key, QtGui.QIcon(":/database/resources/treatment.svg"),
+                          locked=False, is_header=False)
+            parent_item.appendRow(item)
+            dlg.close()
+
+    def new_session(self):
+        # get parent node
+        ix = self.db_tree.currentIndex()
+        parent_item = self.tree_model.itemFromIndex(ix)
+        item_type, key = parent_item.get_key()
+        if item_type == "S":
+            parent_item = parent_item.parent()
+            _, key = parent_item.get_key()
+        # if item type is "T" selected node is the parent node actually
+        # Count number of sessions present
+        dlg = QtGui.QDialog()
+        dlg.setWindowTitle("New Session")
+        l = QtGui.QVBoxLayout()
+        sn = parent_item.rowCount() + 1
+        form = session.SessionForm(self.db, mode=session.SessionForm.NEW_RECORD,
+                                   parent_id=key, session_number=sn, parent=self)
+        form.new_record_stored.connect(dlg.accept)
+        l.addWidget(form)
+        dlg.setLayout(l)
+        if dlg.exec_() == QtGui.QDialog.Accepted:
+            # Add new row instead of repopulate all the tree
+            tx_key = "S#" + str(form.record_id)
+            txt = str(form)
+            item = MyItem(txt, tx_key, QtGui.QIcon(":/database/resources/medicine.svg"),
                           locked=False, is_header=False)
             parent_item.appendRow(item)
             dlg.close()
@@ -141,23 +192,18 @@ class Tree(QtGui.QFrame):
     def open_context_menu(self, position):
         ix = self.db_tree.indexAt(position)
         item = self.tree_model.itemFromIndex(ix)
+        node_is_locked = item.is_locked()
         t, _ = item.get_key()
         level = self.levels.index(t)
-        # Disable action if not in the correct level
+        # Hide or disable action following node level
+        # Does it work for level>3?
         menu_action_list = self.context_menu.actions()
         for a in menu_action_list:
-            a.setVisible(abs(menu_action_list.index(a) - level) <= 1)
-        # Disable action if some item brother is enabled
-        parent_item = item.parent()
-        if level > 0:
-            all_locked = True
-            for i in range(parent_item.rowCount()):
-                all_locked = all_locked & parent_item.child(i).is_locked()
-            if not all_locked:
-                self.context_menu.actions()[level].setEnabled(False)
-                tx = self.context_menu.actions()[level].text()
-                # todo: verify all_locked in the three menu item visible
-                self.context_menu.actions()[level].setText("Some items unlocked: Can't create a " + tx)
+            ix = menu_action_list.index(a)
+            is_visible = (level < 2 and 0 <= (ix - level) <= 1) or (1 < level <= ix)
+            a.setVisible(is_visible)
+            is_enabled = (level == ix or not node_is_locked)
+            a.setEnabled(is_enabled)
         self.context_menu.exec_(self.db_tree.viewport().mapToGlobal(position))
 
     def update_item(self, txt):
@@ -223,9 +269,11 @@ class MyModel(QtGui.QStandardItemModel):
                 txt += " (" + query.value(3).toString() + ")" if not query.value(3).isNull() else ""
                 print txt + "<<< treatment locked >>>" if locked else ""
             elif level == 2:
-                locked = True
-                txt = query.value(4).toString()
-                txt += " (" + query.value(3).toString() + " MBq)"
+                locked = query.value(6).toBool()
+                txt = "#" + query.value(2).toString() + ": " + query.value(4).toString() + \
+                      " (" + query.value(3).toString() + "MBq @ "
+                txt += query.value(5).toDate().toString("dd/MM/yyyy")
+                txt += query.value(5).toTime().toString(" HH:mm") + ")"
             key = query.value(0)
             k, _ = key.toInt()
             key = key.toString() if level == 0 else k
