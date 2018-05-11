@@ -5,7 +5,7 @@ from PyQt4 import QtCore
 from PyQt4 import QtGui
 from PyQt4 import QtSql
 import icons_rc
-import patient, treatment, session
+import patient, treatment, session, dosimetry
 
 
 class Tree(QtGui.QFrame):
@@ -23,7 +23,7 @@ class Tree(QtGui.QFrame):
         super(Tree, self).__init__(parent)
         # init some variables
         self.db = db
-        self.levels = ["P", "T", "S"]
+        self.levels = ["P", "T", "S", "D"]
         # Setup gui
         self.setFrameShape(QtGui.QFrame.StyledPanel)
         self.setFrameShadow(QtGui.QFrame.Raised)
@@ -49,6 +49,10 @@ class Tree(QtGui.QFrame):
                                                "New session", self.context_menu)
         self.act_new_session.triggered.connect(self.new_session)
         self.context_menu.addAction(self.act_new_session)
+        self.act_new_dosimetry = QtGui.QAction(QtGui.QIcon(":/database/resources/trebol.svg"),
+                                             "New dosimetry", self.context_menu)
+        self.act_new_dosimetry.triggered.connect(self.new_dosimetry)
+        self.context_menu.addAction(self.act_new_dosimetry)
         # Widgets...
         self.db_tree.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.db_tree.customContextMenuRequested.connect(self.open_context_menu)
@@ -76,6 +80,13 @@ class Tree(QtGui.QFrame):
         self.session_form.setFixedWidth(400)
         l.addWidget(self.session_form)
         self.session_form.setVisible(False)
+        # ...Session form
+        self.dosimetry_form = dosimetry.DosimetryForm(self.db)
+        self.dosimetry_form.record_updated.connect(self.update_item)
+        self.dosimetry_form.lock_record.connect(self.lock_item)
+        self.dosimetry_form.setFixedWidth(400)
+        l.addWidget(self.dosimetry_form)
+        self.dosimetry_form.setVisible(False)
         spring = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         l.addItem(spring)
         self.setLayout(l)
@@ -102,8 +113,39 @@ class Tree(QtGui.QFrame):
         elif item_type == "S":
             self.session_form.setVisible(True)
             self.session_form.update_form(item_key, locked)
+        elif item_type == "D":
+            self.dosimetry_form.setVisible(True)
+            self.dosimetry_form.update_form(item_key, locked)
         else:
             self.space_keeper.setVisible(True)
+
+    def new_dosimetry(self):
+        # get parent node
+        ix = self.db_tree.currentIndex()
+        parent_item = self.tree_model.itemFromIndex(ix)
+        item_type, key = parent_item.get_key()
+        if item_type == "D":
+            parent_item = parent_item.parent()
+            _, key = parent_item.get_key()
+        # if item type is "S" selected node is the parent node actually
+        # Count number of sessions present
+        dlg = QtGui.QDialog()
+        dlg.setWindowTitle("New Dosimetry")
+        l = QtGui.QVBoxLayout()
+        sn = parent_item.rowCount() + 1
+        form = dosimetry.DosimetryForm(self.db, mode=dosimetry.DosimetryForm.NEW_RECORD,
+                                       parent_id=key, parent=self)
+        form.new_record_stored.connect(dlg.accept)
+        l.addWidget(form)
+        dlg.setLayout(l)
+        if dlg.exec_() == QtGui.QDialog.Accepted:
+            # Add new row instead of repopulate all the tree
+            tx_key = "D#" + str(form.record_id)
+            txt = str(form)
+            item = MyItem(txt, tx_key, QtGui.QIcon(":/database/resources/trebol.svg"),
+                          locked=False, is_header=False)
+            parent_item.appendRow(item)
+            dlg.close()
 
     def new_patient(self, force_input):
         """
@@ -222,7 +264,7 @@ class MyModel(QtGui.QStandardItemModel):
     """
     Model for dosimetry tree
     """
-    tables = {0: "Patients", 1: "Treatments", 2: "Sessions"}
+    tables = ["Patients", "Treatments", "Sessions", "Dosimetries"]
 
     def __init__(self, db, parent=None):
         super(MyModel, self).__init__(0, 1,  parent)
@@ -232,11 +274,12 @@ class MyModel(QtGui.QStandardItemModel):
         # icons
         self.node_icons = [QtGui.QIcon(":/database/resources/patient.svg"),
                            QtGui.QIcon(":/database/resources/treatment.svg"),
-                           QtGui.QIcon(":/database/resources/medicine.svg")]
+                           QtGui.QIcon(":/database/resources/medicine.svg"),
+                           QtGui.QIcon(":/database/resources/trebol.svg")]
 
     def populate(self, parent_node=None, level=0):
         # Stopper for the recursive items filling from different tables
-        if level > 2:
+        if level > 3:
             return
         query = QtSql.QSqlQuery(self.db)
         try:
@@ -249,6 +292,8 @@ class MyModel(QtGui.QStandardItemModel):
             tx_query += " WHERE N_Patient='{}'".format(value)
         elif level == 2:
             tx_query += " WHERE N_Treatment={}".format(value)
+        elif level == 3:
+            tx_query += " WHERE N_Session={}".format(value)
         logging.info("Executing query '{}' for ".format(tx_query))
         query.exec_(tx_query)
         query.first()
@@ -259,6 +304,7 @@ class MyModel(QtGui.QStandardItemModel):
             return
         while True:
             header = False
+            highlighted = False
             if level == 0:
                 locked = False
                 header = True
@@ -274,12 +320,17 @@ class MyModel(QtGui.QStandardItemModel):
                       " (" + query.value(3).toString() + "MBq @ "
                 txt += query.value(5).toDate().toString("dd/MM/yyyy")
                 txt += query.value(5).toTime().toString(" HH:mm") + ")"
+            elif level == 3:
+                locked = False
+                highlighted = query.value(4).toBool()
+                txt = "Dosimetry"
+                txt += ": approved by " + str(query.value(2).toString()) if query.value(4).toBool() else ""
             key = query.value(0)
             k, _ = key.toInt()
             key = key.toString() if level == 0 else k
             tx_key = self.tables[level][0] + "#" + str(key)
             print "item: key={}, text={}".format(tx_key, txt)
-            item = MyItem(txt, tx_key, self.node_icons[level], locked, is_header=header)
+            item = MyItem(txt, tx_key, self.node_icons[level], locked, highlighted, is_header=header)
             self.populate(item, level + 1)
             parent_node.appendRow(item)
             if not query.next():
@@ -311,7 +362,7 @@ class MyItem(QtGui.QStandardItem):
             self.setBackground(QtGui.QBrush(QtGui.QColor(224, 224, 224)))
             self.setToolTip("Inactive record")
         elif self.highlighted:
-            self.setForeground(QtGui.QBrush(QtGui.QColor(255, 255, 255)))
+            self.setForeground(QtGui.QBrush(QtGui.QColor(0, 192, 0)))
             self.setBackground(QtGui.QBrush(QtGui.QColor(255, 186, 159)))
             self.setToolTip("Highlighted record")
         if self.is_header:
@@ -346,7 +397,7 @@ class MyItem(QtGui.QStandardItem):
         if not self.locked:
             return
         self.highlighted = highlighted
-        fore_color = QtGui.QColor(255, 255, 255) if self.highlighted else QtGui.QColor(0, 127, 0)
+        fore_color = QtGui.QColor(0, 192, 0) if self.highlighted else QtGui.QColor(0, 127, 0)
         self.setForeground(QtGui.QBrush(fore_color))
         back_color = QtGui.QColor(255, 186, 159) if self.highlighted else QtGui.QColor(255, 255, 255)
         self.setBackground(QtGui.QBrush(back_color))

@@ -126,27 +126,28 @@ class TreatmentForm(ui_treatment.Ui_Frame, QFrame):
             self.lock_record.emit()
 
     def eventFilter(self, o, evt):
-            """
-            Manage if some record has been changed
-            :param o: The source(QObject) of the event
-            :param evt: The event(QEvent) raised
-            :return: View docs for True/False meaning
-            """
+        """
+        Manage if some record has been changed
+        :param o: The source(QObject) of the event
+        :param evt: The event(QEvent) raised
+        :return: View docs for True/False meaning
+        """
 
-            def get_value(o2):
-                if type(o2) == QLineEdit:
-                    return o2.text()
-                elif type(o2) == QDateEdit:
-                    return o2.date()
-                else:  # QComboBox:
-                    return o2.currentIndex()
+        def get_value(o2):
+            if type(o2) == QLineEdit:
+                return o2.text()
+            elif type(o2) == QDateEdit:
+                return o2.date()
+            else:  # QComboBox:
+                return o2.currentIndex()
 
-            if evt.type() == QEvent.FocusIn:
-                self.old_value = get_value(o)
-            elif evt.type() == QEvent.FocusOut:
-                self.record_changed = (self.old_value != get_value(o))
+        if evt.type() == QEvent.FocusIn:
+            self.old_value = get_value(o)
+        elif evt.type() == QEvent.FocusOut:
+            self.record_changed |= (self.old_value != get_value(o))
+            if self.record_changed:
                 logging.info("record ({}) has changed".format(self.record_id))
-            return False
+        return False
 
     def notes(self):
         dlg = dialogs.Notes("Treatment notes", self.tx_notes.toPlainText())

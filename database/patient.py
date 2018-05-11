@@ -114,8 +114,9 @@ class PatientForm(ui_patient.Ui_Patient, QFrame):
         if evt.type() == QEvent.FocusIn:
             self.old_value = get_value(o)
         elif evt.type() == QEvent.FocusOut:
-            self.record_changed = (self.old_value != get_value(o))
-            logging.info("record ({}) has changed".format(self.tx_id.text()))
+            self.record_changed |= (self.old_value != get_value(o))
+            if self.record_changed:
+                logging.info("record ({}) has changed".format(self.tx_id.text()))
         return False
 
     def notes(self):
