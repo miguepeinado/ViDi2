@@ -4,7 +4,6 @@
     <file>resources/change-slice.svg</file>
     <file>resources/clone-rois.svg</file>
     <file>resources/copy.svg</file>
-    <file>resources/exit.svg</file>
     <file>resources/WL.svg</file>
     <file>resources/roi-stats.svg</file>
     <file>resources/open-file.svg</file>
@@ -21,7 +20,9 @@
     <file>resources/zoom-cursor.svg</file>
   </qresource>
   <qresource prefix="database">
+    <file>resources/calculator.svg</file>
     <file>resources/tools.svg</file>
+    <file>resources/dosimetry.svg</file>
     <file>resources/new-patient.svg</file>
     <file>resources/medicine.svg</file>
     <file>resources/trebol.svg</file>
@@ -37,5 +38,6 @@
   </qresource>
   <qresource prefix="main">
     <file>resources/ViDi.svg</file>
+    <file>resources/exit.svg</file>
   </qresource>
 </RCC>

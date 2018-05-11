@@ -5,10 +5,11 @@ ViDi2 is the old ViDi in a new form to include non image tests (as blood assays)
 - Also the whole database structure has to be redefined.
 
 ###DONE:
-This is an initial version, all is to be done.
+Manages Patient, treatment, sessions and dosimetries tables
+
 
 ###TODO:
-This is an initial version, all is to be done.
+Almost all is to be done.
     
 ###BUGS:
-No bugs detected
+Bug corrected in form change detection
