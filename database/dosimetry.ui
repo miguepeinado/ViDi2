@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>486</width>
+    <width>438</width>
     <height>235</height>
    </rect>
   </property>
@@ -36,38 +36,90 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>461</width>
-     <height>205</height>
+     <width>391</width>
+     <height>245</height>
     </rect>
    </property>
    <layout class="QGridLayout" name="grid_layout">
     <property name="margin">
      <number>10</number>
     </property>
-    <item row="0" column="1">
-     <widget class="QLabel" name="label_2">
+    <item row="3" column="3" colspan="2">
+     <widget class="QPushButton" name="bt_confirm">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <property name="text">
-       <string>Physicist</string>
+       <string>Confirm</string>
+      </property>
+      <property name="icon">
+       <iconset resource="../icons.qrc">
+        <normaloff>:/database/resources/confirm.svg</normaloff>:/database/resources/confirm.svg</iconset>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
       </property>
      </widget>
     </item>
-    <item row="0" column="2" colspan="4">
-     <widget class="QLineEdit" name="tx_physicist"/>
-    </item>
-    <item row="3" column="0" colspan="6">
-     <widget class="QPlainTextEdit" name="tx_notes">
-      <property name="maximumSize">
-       <size>
-        <width>16777215</width>
-        <height>16777215</height>
-       </size>
+    <item row="2" column="0">
+     <widget class="QLabel" name="label_3">
+      <property name="text">
+       <string>Date referral</string>
       </property>
      </widget>
     </item>
-    <item row="1" column="0" colspan="2">
+    <item row="2" column="1" colspan="2">
+     <widget class="QDateEdit" name="dt_referral">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="buttonSymbols">
+       <enum>QAbstractSpinBox::PlusMinus</enum>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0">
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string>Date Aproval</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="1" colspan="2">
+     <widget class="QDateEdit" name="dt_aproval">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="buttonSymbols">
+       <enum>QAbstractSpinBox::PlusMinus</enum>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="3" colspan="2">
      <widget class="QPushButton" name="bt_calculate">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
@@ -96,14 +148,14 @@
       </property>
      </widget>
     </item>
-    <item row="1" column="2">
-     <widget class="QLabel" name="label">
+    <item row="1" column="0">
+     <widget class="QLabel" name="label_2">
       <property name="text">
-       <string>Date Aproval</string>
+       <string>Physicist</string>
       </property>
      </widget>
     </item>
-    <item row="2" column="4">
+    <item row="0" column="2">
      <widget class="QLineEdit" name="tx_n_session">
       <property name="enabled">
        <bool>false</bool>
@@ -122,32 +174,16 @@
       </property>
      </widget>
     </item>
-    <item row="1" column="5">
-     <widget class="QPushButton" name="bt_confirm">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="text">
-       <string>Confirm</string>
-      </property>
-      <property name="checkable">
-       <bool>true</bool>
-      </property>
-     </widget>
+    <item row="1" column="1" colspan="4">
+     <widget class="QLineEdit" name="tx_physicist"/>
     </item>
-    <item row="1" column="3" colspan="2">
-     <widget class="QDateEdit" name="dt_aproval">
-      <property name="enabled">
-       <bool>true</bool>
-      </property>
-      <property name="buttonSymbols">
-       <enum>QAbstractSpinBox::PlusMinus</enum>
-      </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
+    <item row="4" column="0" colspan="5">
+     <widget class="QPlainTextEdit" name="tx_notes">
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>16777215</height>
+       </size>
       </property>
      </widget>
     </item>
@@ -193,9 +229,6 @@
    </property>
   </action>
  </widget>
- <tabstops>
-  <tabstop>tx_physicist</tabstop>
- </tabstops>
  <resources>
   <include location="../icons.qrc"/>
  </resources>

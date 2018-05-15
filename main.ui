@@ -6,52 +6,324 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>893</width>
+    <height>675</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
   <property name="windowTitle">
-   <string>ViDi</string>
+   <string>MainGui - Visor Dicom</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="icons.qrc">
-    <normaloff>:/main/resources/ViDi.svg</normaloff>:/main/resources/ViDi.svg</iconset>
+   <iconset>
+    <normaloff>:/Otros/resources/MainGui.svg</normaloff>:/Otros/resources/MainGui.svg</iconset>
+  </property>
+  <property name="windowOpacity">
+   <double>25.000000000000000</double>
+  </property>
+  <property name="autoFillBackground">
+   <bool>false</bool>
+  </property>
+  <property name="styleSheet">
+   <string notr="true"/>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QDockWidget" name="dock_widget">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>0</y>
-      <width>318</width>
-      <height>630</height>
-     </rect>
-    </property>
-    <property name="minimumSize">
-     <size>
-      <width>318</width>
-      <height>41</height>
-     </size>
-    </property>
-    <property name="maximumSize">
-     <size>
-      <width>518</width>
-      <height>524287</height>
-     </size>
-    </property>
-    <property name="features">
-     <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
-    </property>
-    <property name="allowedAreas">
-     <set>Qt::LeftDockWidgetArea</set>
-    </property>
-    <widget class="QWidget" name="dockWidgetContents"/>
-   </widget>
+   <property name="minimumSize">
+    <size>
+     <width>414</width>
+     <height>489</height>
+    </size>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout"/>
   </widget>
   <widget class="QStatusBar" name="status_bar"/>
+  <widget class="QDockWidget" name="dock_widget">
+   <property name="minimumSize">
+    <size>
+     <width>318</width>
+     <height>41</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>518</width>
+     <height>524287</height>
+    </size>
+   </property>
+   <property name="features">
+    <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
+   </property>
+   <property name="allowedAreas">
+    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents"/>
+  </widget>
+  <action name="act_zoom">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>:/Actions/pictures/zoom.svg</normaloff>
+     <activeon>:/Actions/pictures/change-slice.svg</activeon>:/Actions/pictures/zoom.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Zoom</string>
+   </property>
+   <property name="toolTip">
+    <string>Zoom image/Move Z</string>
+   </property>
+  </action>
+  <action name="act_change_slice">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>:/Actions/pictures/change-slice.svg</normaloff>:/Actions/pictures/change-slice.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Change image</string>
+   </property>
+   <property name="toolTip">
+    <string>Navigate between images</string>
+   </property>
+  </action>
+  <action name="act_roi_pol">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>:/Actions/pictures/new-pol-roi.svg</normaloff>:/Actions/pictures/new-pol-roi.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Draw roi</string>
+   </property>
+   <property name="toolTip">
+    <string>Draw polygonal roi</string>
+   </property>
+  </action>
+  <action name="act_roi_circ">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>:/Actions/pictures/new-circ-roi.svg</normaloff>:/Actions/pictures/new-circ-roi.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Draw circular roi</string>
+   </property>
+   <property name="toolTip">
+    <string>Draw circular roi</string>
+   </property>
+  </action>
+  <action name="act_roi_auto">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>:/Actions/pictures/auto-roi.svg</normaloff>:/Actions/pictures/auto-roi.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Automatic roi</string>
+   </property>
+   <property name="toolTip">
+    <string>Automatically defines a roi</string>
+   </property>
+  </action>
+  <action name="act_get_stats">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>:/Actions/pictures/roi-stats.svg</normaloff>:/Actions/pictures/roi-stats.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Roi stats</string>
+   </property>
+   <property name="toolTip">
+    <string>Get roi statistics</string>
+   </property>
+  </action>
+  <action name="act_select">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>:/Actions/pictures/select.svg</normaloff>:/Actions/pictures/select.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Select</string>
+   </property>
+   <property name="toolTip">
+    <string>selection tool</string>
+   </property>
+  </action>
+  <action name="act_dosimetry">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/Actions/pictures/dosimetry.svg</normaloff>:/Actions/pictures/dosimetry.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Internal dosimetry</string>
+   </property>
+   <property name="toolTip">
+    <string>Opens internal dosimetry tool</string>
+   </property>
+  </action>
+  <action name="act_show_info">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>:/Actions/pictures/patient-info.svg</normaloff>:/Actions/pictures/patient-info.svg</iconset>
+   </property>
+   <property name="text">
+    <string>show info</string>
+   </property>
+  </action>
+  <action name="act_clone_rois">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/Actions/pictures/clone-rois.svg</normaloff>:/Actions/pictures/clone-rois.svg</iconset>
+   </property>
+   <property name="text">
+    <string>clone roi(s)</string>
+   </property>
+   <property name="toolTip">
+    <string>Clone selected roi(s) to other slices</string>
+   </property>
+  </action>
+  <action name="act_phantom">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>:/Actions/pictures/phantom.svg</normaloff>:/Actions/pictures/phantom.svg</iconset>
+   </property>
+   <property name="text">
+    <string>MIRD-5 phantom</string>
+   </property>
+   <property name="toolTip">
+    <string>SPECT/CT image of MIRD-5 phantom</string>
+   </property>
+  </action>
+  <action name="act_settings">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>:/Actions/pictures/settings.svg</normaloff>:/Actions/pictures/settings.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Settings</string>
+   </property>
+   <property name="toolTip">
+    <string>Program settings</string>
+   </property>
+  </action>
+  <action name="actWL">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>:/Actions/pictures/WL.svg</normaloff>:/Actions/pictures/WL.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Window/Level</string>
+   </property>
+   <property name="toolTip">
+    <string>Change Window/Level</string>
+   </property>
+  </action>
+  <action name="act_exit">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/Actions/pictures/exit.svg</normaloff>:/Actions/pictures/exit.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Exit</string>
+   </property>
+   <property name="toolTip">
+    <string>Exit ViDi</string>
+   </property>
+  </action>
+  <action name="act_experimental">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/Actions/pictures/experimental.svg</normaloff>:/Actions/pictures/experimental.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Experimental</string>
+   </property>
+   <property name="toolTip">
+    <string>Tools in development or experiences</string>
+   </property>
+  </action>
  </widget>
  <resources>
   <include location="icons.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>act_exit</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>446</x>
+     <y>337</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

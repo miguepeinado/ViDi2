@@ -30,6 +30,7 @@ class DosimetryForm(ui_dosimetry.Ui_Frame, QFrame):
         self.old_value = None
         self.record_changed = False
         self.tx_physicist.installEventFilter(self)
+        self.dt_referral.installEventFilter(self)
         self.dt_aproval.installEventFilter(self)
         self.bt_confirm.installEventFilter(self)
         # ...actions
@@ -58,10 +59,11 @@ class DosimetryForm(ui_dosimetry.Ui_Frame, QFrame):
         self.dosimetry_mapper.setSubmitPolicy(QDataWidgetMapper.ManualSubmit)
         self.dosimetry_mapper.setModel(self.dosimetry_model)
         self.dosimetry_mapper.addMapping(self.tx_n_session, 1)
-        self.dosimetry_mapper.addMapping(self.tx_physicist, 2)
-        self.dosimetry_mapper.addMapping(self.dt_aproval, 3)
-        self.dosimetry_mapper.addMapping(self.bt_confirm, 4)
-        self.dosimetry_mapper.addMapping(self.tx_notes, 5)
+        self.dosimetry_mapper.addMapping(self.dt_referral, 2)
+        self.dosimetry_mapper.addMapping(self.tx_physicist, 3)
+        self.dosimetry_mapper.addMapping(self.dt_aproval, 4)
+        self.dosimetry_mapper.addMapping(self.bt_confirm, 5)
+        self.dosimetry_mapper.addMapping(self.tx_notes, 6)
         if self.mode == self.NEW_RECORD:
             if parent_id is None:
                 tx1 = "Database error"
@@ -74,6 +76,7 @@ class DosimetryForm(ui_dosimetry.Ui_Frame, QFrame):
             self.dosimetry_model.insertRow(row)
             self.dosimetry_mapper.setCurrentIndex(row)
             self.tx_n_session.setText(parent_id)
+            self.dt_referral.setDate(QDate.currentDate())
             self.act_edit.trigger()
 
     def approve_dosimetry(self, is_checked):
@@ -104,6 +107,7 @@ class DosimetryForm(ui_dosimetry.Ui_Frame, QFrame):
     def enable_fields(self, enabled):
         self.tx_physicist.setEnabled(enabled)
         self.bt_confirm.setEnabled(enabled)
+        self.dt_referral.setEnabled(enabled)
         self.dt_aproval.setEnabled(enabled)
         self.act_undo.setEnabled(enabled)
 

@@ -23,13 +23,13 @@ class Tree(QtGui.QFrame):
         super(Tree, self).__init__(parent)
         # init some variables
         self.db = db
-        self.levels = ["P", "T", "S", "D"]
-        # Setup gui
+        self.levels = ["P", "T", "S", "D", "A", "I"]
+        # Setup gui...
         self.setFrameShape(QtGui.QFrame.StyledPanel)
         self.setFrameShadow(QtGui.QFrame.Raised)
         l = QtGui.QVBoxLayout()
         self.db_tree = QtGui.QTreeView(self)
-        self.db_tree.setMinimumHeight(400)
+        self.db_tree.setMinimumHeight(450)
         self.db_tree.setIndentation(16)
         self.db_tree.setIconSize(QtCore.QSize(20, 20))
         self.db_tree.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.MinimumExpanding)
@@ -53,9 +53,18 @@ class Tree(QtGui.QFrame):
                                              "New dosimetry", self.context_menu)
         self.act_new_dosimetry.triggered.connect(self.new_dosimetry)
         self.context_menu.addAction(self.act_new_dosimetry)
-        # Widgets...
+        self.act_new_assay = QtGui.QAction(QtGui.QIcon(":/database/resources/experimental.svg"),
+                                               "New assay", self.context_menu)
+        self.act_new_assay.triggered.connect(self.new_assay)
+        self.context_menu.addAction(self.act_new_assay)
+        self.act_new_image = QtGui.QAction(QtGui.QIcon(":/database/resources/image1.svg"),
+                                               "New image dataset", self.context_menu)
+        self.act_new_image.triggered.connect(self.new_image)
+        self.context_menu.addAction(self.act_new_image)
         self.db_tree.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.db_tree.customContextMenuRequested.connect(self.open_context_menu)
+
+        # Widgets...
         l.addWidget(self.db_tree)
         self.space_keeper = QtGui.QLabel(" ")
         self.space_keeper.setFixedSize(QtCore.QSize(400, 200))
@@ -119,6 +128,9 @@ class Tree(QtGui.QFrame):
         else:
             self.space_keeper.setVisible(True)
 
+    def new_assay(self):
+        pass
+
     def new_dosimetry(self):
         # get parent node
         ix = self.db_tree.currentIndex()
@@ -146,6 +158,9 @@ class Tree(QtGui.QFrame):
                           locked=False, is_header=False)
             parent_item.appendRow(item)
             dlg.close()
+
+    def new_image(self):
+        pass
 
     def new_patient(self, force_input):
         """
@@ -242,7 +257,7 @@ class Tree(QtGui.QFrame):
         menu_action_list = self.context_menu.actions()
         for a in menu_action_list:
             ix = menu_action_list.index(a)
-            is_visible = (level < 2 and 0 <= (ix - level) <= 1) or (1 < level <= ix)
+            is_visible = (level < 3 and 0 <= (ix - level) <= 1) or (2 < level <= ix)
             a.setVisible(is_visible)
             is_enabled = (level == ix or not node_is_locked)
             a.setEnabled(is_enabled)
@@ -264,7 +279,7 @@ class MyModel(QtGui.QStandardItemModel):
     """
     Model for dosimetry tree
     """
-    tables = ["Patients", "Treatments", "Sessions", "Dosimetries"]
+    tables = ["Patients", "Treatments", "Sessions", "Dosimetries", "Acquisitions"]
 
     def __init__(self, db, parent=None):
         super(MyModel, self).__init__(0, 1,  parent)
@@ -275,12 +290,12 @@ class MyModel(QtGui.QStandardItemModel):
         self.node_icons = [QtGui.QIcon(":/database/resources/patient.svg"),
                            QtGui.QIcon(":/database/resources/treatment.svg"),
                            QtGui.QIcon(":/database/resources/medicine.svg"),
-                           QtGui.QIcon(":/database/resources/trebol.svg")]
+                           QtGui.QIcon(":/database/resources/trebol.svg"),
+                           QtGui.QIcon(":/database/resources/experimental.svg"),
+                           QtGui.QIcon(":/database/resources/image1.svg")]
 
     def populate(self, parent_node=None, level=0):
         # Stopper for the recursive items filling from different tables
-        if level > 3:
-            return
         query = QtSql.QSqlQuery(self.db)
         try:
             _, value = parent_node.get_key()
@@ -294,6 +309,8 @@ class MyModel(QtGui.QStandardItemModel):
             tx_query += " WHERE N_Treatment={}".format(value)
         elif level == 3:
             tx_query += " WHERE N_Session={}".format(value)
+        elif level > 3:
+            tx_query += " WHERE N_Dosimetry={}".format(value)
         logging.info("Executing query '{}' for ".format(tx_query))
         query.exec_(tx_query)
         query.first()
@@ -304,9 +321,11 @@ class MyModel(QtGui.QStandardItemModel):
             return
         while True:
             header = False
+            locked = False
             highlighted = False
+            tx_key = self.tables[level][0]
+            icon = self.node_icons[level]
             if level == 0:
-                locked = False
                 header = True
                 txt = query.value(1).toString() + " (" + query.value(0).toString() + ")"
             elif level == 1:
@@ -321,17 +340,23 @@ class MyModel(QtGui.QStandardItemModel):
                 txt += query.value(5).toDate().toString("dd/MM/yyyy")
                 txt += query.value(5).toTime().toString(" HH:mm") + ")"
             elif level == 3:
-                locked = False
                 highlighted = query.value(4).toBool()
-                txt = "Dosimetry"
-                txt += ": approved by " + str(query.value(2).toString()) if query.value(4).toBool() else ""
+                txt = "Dosimetry: " + query.value(2).toDate().toString("dd/MM/yyyy")
+                txt += ". Approved by " + str(query.value(3).toString()) if query.value(5).toBool() else ""
+            elif level > 3:
+                txt = query.value(3).toString() + query.value(2).toDate().toString("dd/MM/yyyy")
+                if query.value(4).toString() != "ASSAY":
+                    tx_key = "I"
+                    icon = self.node_icons[level + 1]
             key = query.value(0)
             k, _ = key.toInt()
             key = key.toString() if level == 0 else k
-            tx_key = self.tables[level][0] + "#" + str(key)
+            tx_key += "#" + str(key)
             print "item: key={}, text={}".format(tx_key, txt)
-            item = MyItem(txt, tx_key, self.node_icons[level], locked, highlighted, is_header=header)
-            self.populate(item, level + 1)
+            item = MyItem(txt, tx_key, icon, locked, highlighted, is_header=header)
+            # Stopper for the recursive items filling from different tables
+            if level < 4:
+                self.populate(item, level + 1)
             parent_node.appendRow(item)
             if not query.next():
                 break

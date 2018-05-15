@@ -10,7 +10,9 @@ Manages Patient, treatment, sessions and dosimetries tables
 
 ###TODO:
 
-There is much repetitive code in database tree that may be simplified
-    
+There is much code repeated in database tree. Can it be simplified?
+
+Add a method field in dosimetry (may de elsewhere) to calculate after phantom or S-voxel...
 ###BUGS:
-Bug corrected in form change detection
+11/05/18 (corrected): Forms changes detection
+14/05/18 (detected): Forms update when no changes made don't disable fields
